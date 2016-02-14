@@ -138,7 +138,18 @@ print REV
 
 print "Follow the directions."+NEWL
 
-print "Set your z axis next to your starting point, .1mm below the working surface we will"+NEWL
+print "We are assuming that you have already homed or set new zero cords."+NEWL
+print "!!!!!READ THIS!!!!!"+RET
+print "Currently this script has no limits on x and y so be carefull when you set your cords."+RET
+print "We are also assuming that your Y axis will be the orientation by whitch we planar the surface."+RET
+print "Example, your x axis is Static meaning it only moves from xStart to Xend it does not stop it does not change."+RET
+print "Your Y axis on the other hand is what changes by 1,2,or 3mm."
+print "If this is confusing generate a small Surface planar code set eg xS=0,xE=20,yS=0,yE=20 Quality fine, Material any."+RET
+print "move your axis to a location they will not interfere with anything. Raise your Z axis enough that it wont "+RET
+print "hit anything either. This will be a test so you can see how this script works with your machine."+RET
+print "Load the file generated and hit print."+NEWL
+
+print "Set your z axis next to your starting point, .1mm below the working surface we will"+RET
 print "take care of the rest."+NEWL
 
 response = raw_input("What is your default x axis feed rate? $110 setting : ")
