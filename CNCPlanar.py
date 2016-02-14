@@ -185,9 +185,9 @@ def makeNcFile(sfile, yEnd):
 	#lift the z axis a bit.
 	commands.append("(lift the z axis out of the way)")
 	commands.append('G0Z10')
-	#home.
-	commands.append("(Home the device we are done.)")
-	commands.append('$H') 
+	#home. GRBL wont home after M30 system not IDLE
+	#commands.append("(Home the device we are done.)")
+	#commands.append('$H') 
 	#set feed rates back to normal.
 	commands.append("(Set x axis feed rates back to normal)")
 	commands.append('$110='+str(DEFAULT))
