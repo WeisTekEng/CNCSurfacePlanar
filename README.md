@@ -1,4 +1,7 @@
 # CNCSurfacePlanar
+
+Updated with user definable limits via settings.dat
+
 Custom cnc Surface Planar script intended for use with GRBL
 
 USE THIS SCRIPT AT YOUR OWN RIST!!
