@@ -192,7 +192,7 @@ def makeNcFile(sfile, yEnd):
 	commands.append("(Set x axis feed rates back to normal)")
 	commands.append('$110='+str(DEFAULT))
 	for index in commands:
-		sfile.write(index+RET)
+		sfile.write(index+NEWL)
 	sfile.close()
 	return
 
