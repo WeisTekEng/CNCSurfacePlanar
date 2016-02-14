@@ -202,8 +202,7 @@ print "Follow the directions."+NEWL
 
 print "We are assuming that you have already homed or set new zero cords."+NEWL
 print "!!!!!READ THIS!!!!!"+RET
-print "Currently this script has no limits on x and y so be carefull when you set your cords."+RET
-print "We are also assuming that your Y axis will be the orientation by whitch we planar the surface."+RET
+print "We are assuming that your Y axis will be the orientation by whitch we planar the surface."+RET
 print "Example, your x axis is Static meaning it only moves from xStart to Xend it does not stop it does not change."+RET
 print "Your Y axis on the other hand is what changes by 1,2,or 3mm."
 print "If this is confusing generate a small Surface planar code set eg xS=0,xE=20,yS=0,yE=20 Quality fine, Material any."+RET
