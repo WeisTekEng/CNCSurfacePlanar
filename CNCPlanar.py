@@ -24,9 +24,15 @@
 #  
 import sys, os, math
 
-x = []
-y = []
-z = []
+xMin = 0 #used later to define max x limit.
+xMax = 0	
+yMin = 0 #used later to define max y limit.
+yMax = 0
+zMin = 0 #used later to define max z limit.
+zMax = 0
+settings = []
+
+#User enttered cords system.
 xCordEnd = 0
 xCordStart = 0
 yCordEnd = 0
@@ -59,6 +65,30 @@ REV = "CNC Surface Planer V0.1"
 RET = '\r'
 NEWL = '\n'
 
+def openDefaultSettings():
+	temp = ""
+	global settings
+	if os.path.isfile("settings.dat"):
+		print "file exists"
+		dfile = open("settings.dat","r")
+		for index in dfile:
+			temp = temp + str(index)
+		settings = temp.split(RET)
+		for index in settings:
+			print str(index)
+		dfile.close()
+	else:
+		print "Creating settings.dat file, use this file to define min max cord settings."+NEWL
+		dfile = open("settings.dat","w")
+		dfile.write("each setting is on a new line, integers only. delete this line!"+RET)
+		dfile.write("xmin"+RET)
+		dfile.write("xmax"+RET)
+		dfile.write("ymin"+RET)
+		dfile.write("ymax"+RET)
+		dfile.write("zmin"+RET)
+		dfile.write("zmax")
+		dfile.close()
+		
 def materialSelect():
 	commands.append("(Set the feed rate based on material.)")
 	#Set feed rate of the x axis to something slower.
@@ -152,11 +182,31 @@ print "Load the file generated and hit print."+NEWL
 print "Set your z axis next to your starting point, .1mm below the working surface we will"+RET
 print "take care of the rest."+NEWL
 
+print "Attemping to open settings.dat for cords min and max settings."+RET
+
+openDefaultSettings()
+
 response = raw_input("What is your default x axis feed rate? $110 setting : ")
 DEFAULT = int(response)
 
-response = raw_input("What is your starting x cordinate? : ")
-xCordStart = int(response)
+goodSetting = 0
+#list are funny to me and this is probibly a really ugly way to handle this..
+limit = str(settings[0])
+Min = limit[0]
+Max = limit[2:5]
+while goodSetting == 0:
+	response = raw_input("What is your starting x cordinate? : ")
+	if not int(response) >= int(Min):
+		print limit[0]
+		print "Min Max cord settings enabled, your entered value is below your Min X Axis settings."+RET
+	elif int(response) > int(Max):
+		print limit[1]
+		print "Min Max cord settings enabled, your entered value is above your Max X Axis settings."+RET
+	else:
+		xCordStart = int(response)
+		goodSetting = 1
+
+goodSetting = 0
 
 response = raw_input("What is your ending x cordinate? : ")
 xCordEnd = int(response)
