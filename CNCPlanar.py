@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#  Updated 13.02.2016 20:58:24
+#  Updated 14.02.2016 10:54:36
 #
 #  CNCPlanar.py
 #  
@@ -24,12 +24,7 @@
 #  
 import sys, os, math
 
-xMin = 0 #used later to define max x limit.
-xMax = 0	
-yMin = 0 #used later to define max y limit.
-yMax = 0
-zMin = 0 #used later to define max z limit.
-zMax = 0
+#used to store user set cord limits via settings.dat.
 settings = []
 
 #User enttered cords system.
@@ -61,10 +56,12 @@ ROUGH = 3
 MEDIUM = 2
 FINE = 1
 
-REV = "CNC Surface Planer V0.1"
+REV = "CNC Surface Planer VA.2"
 RET = '\r'
 NEWL = '\n'
 
+#This function checks if a default settings.dat file is found
+#use this file to set your min max axis limits.
 def openDefaultSettings():
 	temp = ""
 	global settings
@@ -74,8 +71,8 @@ def openDefaultSettings():
 		for index in dfile:
 			temp = temp + str(index)
 		settings = temp.split(RET)
-		for index in settings:
-			print str(index)
+		#for index in settings:
+		#	print str(index)
 		dfile.close()
 	else:
 		print "Creating settings.dat file, use this file to define min max cord settings."+NEWL
@@ -88,7 +85,37 @@ def openDefaultSettings():
 		dfile.write("zmin"+RET)
 		dfile.write("zmax")
 		dfile.close()
-		
+
+#This function checks your inputs agaisnt your predefined limits
+#in settings.dat, if settings.dat is missing or incorrect this will not work
+def checkLimits(usr,pos):
+	global goodSetting
+	sCords = ""
+	
+	if pos == 0:
+		sCords = "X"
+		limit = str(settings[0])
+		Min = limit[0]
+		Max = limit[2:5]
+	elif pos == 1:
+		Min = str(settings[1])
+		Max = str(settings[2])
+	elif pos == 2:
+		Min = str(settings[3])
+		Max = str(settings[4])
+		#print "pos 2"
+		#print "Min : " + str(Min)
+		#print "Max : " + str(Max)
+	
+	if not int(usr) >= int(Min):
+		print "Min Max cord settings enabled, your entered value is below your Min "+sCords+" Axis settings."+RET
+	elif int(usr) > int(Max):
+		print "Min Max cord settings enabled, your entered value is above your Max "+sCords+"X Axis settings."+RET
+	else:
+		goodSetting = 1
+		return usr
+
+#This function sets the x axis feed rate based on my experiances with these materials
 def materialSelect():
 	commands.append("(Set the feed rate based on material.)")
 	#Set feed rate of the x axis to something slower.
@@ -110,7 +137,8 @@ def materialSelect():
 		commands.append(Wood_Hard)
 		print "Material set to : Hard Wood"
 	
-	
+#This function sets the quality of the planar, rough is 3mm wide passes
+#Medium is 2mm passes and fine is 1mm passes.
 def finishQuality():
 	#set the finish quality
 	global Multiplier
@@ -125,6 +153,8 @@ def finishQuality():
 		commands.append("(Finish quality selected : Rough)")
 		Multiplier = ROUGH
 
+#This function puts everything together and creates your Material Planar NC file
+#use this file to load into your fav program and away you go.
 def makeNcFile(sfile, yEnd):
 	print "Multiplier : " + str(Multiplier)
 	print "Start and End x Cords : " + str(xCordStart) + " | " + str(xCordEnd)
@@ -133,6 +163,7 @@ def makeNcFile(sfile, yEnd):
 	counter = 0
 	yCounter = 0
 	while counter <= yEnd:
+		print "in the loop" + str(counter)
 		#z will be setup later for multipule passes
 		#y
 		commands.append(MOVE+'Y'+str(yCounter))
@@ -162,6 +193,7 @@ def makeNcFile(sfile, yEnd):
 	commands.append('$110='+str(DEFAULT))
 	for index in commands:
 		sfile.write(index+RET)
+	sfile.close()
 	return
 
 print REV
@@ -190,33 +222,26 @@ response = raw_input("What is your default x axis feed rate? $110 setting : ")
 DEFAULT = int(response)
 
 goodSetting = 0
-#list are funny to me and this is probibly a really ugly way to handle this..
-limit = str(settings[0])
-Min = limit[0]
-Max = limit[2:5]
 while goodSetting == 0:
 	response = raw_input("What is your starting x cordinate? : ")
-	if not int(response) >= int(Min):
-		print limit[0]
-		print "Min Max cord settings enabled, your entered value is below your Min X Axis settings."+RET
-	elif int(response) > int(Max):
-		print limit[1]
-		print "Min Max cord settings enabled, your entered value is above your Max X Axis settings."+RET
-	else:
-		xCordStart = int(response)
-		goodSetting = 1
+	xCordStart = checkLimits(response,0)
 
 goodSetting = 0
+#lists are still funny to me..
+while goodSetting == 0:
+	response = raw_input("What is your ending x cordinate? : ")
+	xCordEnd = checkLimits(response,0)
+		
+goodSetting = 0
+while goodSetting == 0:
+	response = raw_input("What is your starting Y cordinate? : ")
+	yCordStart = checkLimits(response,1)
 
-response = raw_input("What is your ending x cordinate? : ")
-xCordEnd = int(response)
-
-response = raw_input("What is your starting Y cordinate? : ")
-yCordStart = int(response)
-
-response = raw_input("What is your ending Y cordinate? : ")
-yCordEnd = int(response)
-
+goodSetting = 0
+while goodSetting == 0:
+	response = raw_input("What is your ending Y cordinate? : ")
+	yCordEnd = checkLimits(response,1)
+	
 materialSelect()
 finishQuality()
 
@@ -226,7 +251,7 @@ sfile.write("("+REV+")"+NEWL)
 sfile.write("(Script last updated 13.02.2016 21:26:36)"+NEWL)
 sfile.write("(Created with CNC Surface Planar scipt: WeisTekEng)"+NEWL)
 sfile.write("(www.weistekengineering.com | Jeremy.goss@weistekengineering.com)"+NEWL)
-makeNcFile(sfile,yCordEnd)
+makeNcFile(sfile,int(yCordEnd))
 
 
 
